@@ -20019,3 +20019,10 @@ venv/lib/python3.12/site-packages/qtconsole/tests/__pycache__/test_styles.cpytho
 /venv
 __David.png
 iris-and-friends.code-workspace
+logs.db
+.cache/41/cache.db-x-Cache-29-key.bin
+.cache/42/cache.db
+.gitignore
+.cache/42/cache.db-x-Cache-1-key.bin
+logs.db
+logs.db

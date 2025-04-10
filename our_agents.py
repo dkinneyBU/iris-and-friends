@@ -26,36 +26,36 @@ llm_config = {
 # %%
 # Define the agents with LLM backend
 explorer = autogen.AssistantAgent("Explorer", 
-                                  llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
-                                  code_execution_config=False,
-                                  system_message="You are the explorer and you gather and summarize information from various sources.")
+    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
+    code_execution_config=False,
+    system_message="You are the explorer and you gather and summarize information from various sources.")
 skeptic = autogen.AssistantAgent("Skeptic", 
-                                 llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
-                                 code_execution_config=False,
-                                 system_message="You are the skeptic and you challenge assumptions and look for inconsistencies in information.")
+    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
+    code_execution_config=False,
+    system_message="You are the skeptic and you challenge assumptions and look for inconsistencies in information.")
 synthesizer = autogen.AssistantAgent("Synthesizer", 
-                                     llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
-                                     code_execution_config=False,
-                                     system_message="You are the synthesizer and you Connect ideas, identify patterns, and synthesize insights.")
+    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
+    code_execution_config=False,
+    system_message="You are the synthesizer and you Connect ideas, identify patterns, and synthesize insights.")
 speculator = autogen.AssistantAgent("Speculator", 
-                                    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
-                                    code_execution_config=False,
-                                    system_message="You are the speculator and you propose hypotheses and explore future possibilities.")
+    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
+    code_execution_config=False,
+    system_message="You are the speculator and you propose hypotheses and explore future possibilities.")
 
 # %%
 # Define a user proxy
 user_proxy = autogen.UserProxyAgent("User", 
-                                    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
-                                    human_input_mode="NEVER",
-                                    max_consecutive_auto_reply=20,
-                                    system_message="You are the user and you observe and facilitate the conversation among the agents.")
+    llm_config={"model": "gpt-4o", "temperature": 0.9, "api_key": os.environ.get("OPENAI_API_KEY")},
+    human_input_mode="NEVER",
+    max_consecutive_auto_reply=20,
+    system_message="You are the user and you observe and facilitate the conversation among the agents.")
 
 
 # %%
 # Create a group chat for all agents
 group_chat = autogen.GroupChat(agents=[user_proxy, explorer, skeptic, synthesizer, speculator], 
-                                        max_round=20, 
-                                        messages=[])
+    max_round=20, 
+    messages=[])
 chat_manager = autogen.GroupChatManager(
     groupchat=group_chat,
     llm_config=llm_config  # <-- Fix: Set LLM config for speaker selection
