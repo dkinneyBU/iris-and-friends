@@ -10,7 +10,7 @@ print("Logging session ID: " + str(logging_session_id))
 
 # %% Define the llm configuration parameters
 llm_config = {
-    "model": "gpt-4", 
+    "model": "gpt-4o", 
     "temperature": 0.9,
     "cache_seed": 42,
     "api_key": os.environ.get("OPENAI_API_KEY"),
@@ -72,15 +72,3 @@ if __name__ == "__main__":
     # Use asyncio.run(...) if you are running this script as a standalone script
     # or create_task(...) if running within the editor.
     agent_community_discussion(topic)
-
-# %% Retrieve cache by key
-from autogen.cache import Cache
-
-cache = Cache()
-
-# Example of reading from the cache
-cached_response = cache.get("cache.db-x-Cache-29-key.bin", "default_value_if_not_found")
-
-
-
-# %%
