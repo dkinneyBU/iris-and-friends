@@ -1,12 +1,23 @@
-import os, autogen, asyncio
+import autogen, asyncio
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+
+# sanity check (optional, temporary)
+print("Using API key:", os.environ.get("OPENAI_API_KEY", "")[-6:])
+
 
 OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+if not OPENAI_API_KEY:
+    raise RuntimeError("OPENAI_API_KEY is not set. Put it in your .env file or environment variables.")
 
 BASE_LLM_CONFIG = {
-    "model": "gpt-4o",
-    "api_key": OPENAI_API_KEY,
+    "model": "gpt-4o-mini",
     "temperature": 0.9,
 }
+
 
 def agent(name, system_message, temperature=0.9):
     cfg = dict(BASE_LLM_CONFIG)
@@ -17,6 +28,7 @@ def agent(name, system_message, temperature=0.9):
         code_execution_config=False,
         system_message=system_message,
     )
+
 
 explorer = agent("Explorer", "You are the explorer... summarize key information.", temperature=0.9)
 skeptic = agent("Skeptic", "You are the skeptic... challenge assumptions.", temperature=0.7)
@@ -37,7 +49,10 @@ group_chat = autogen.GroupChat(
     messages=[],
 )
 
-chat_manager = autogen.GroupChatManager(groupchat=group_chat, llm_config=BASE_LLM_CONFIG)
+chat_manager = autogen.GroupChatManager(
+    groupchat=group_chat,
+    llm_config=BASE_LLM_CONFIG,
+)
 
 async def agent_community_discussion(topic):
     await chat_manager.initiate_chat(
