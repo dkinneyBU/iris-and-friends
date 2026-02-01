@@ -26,7 +26,7 @@ while True:
 
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     faces = face_cascade.detectMultiScale(gray, scaleFactor=1.3, minNeighbors=5)
-
+    print(faces)
     if len(faces) > 0 and not face_detected:
         iris_response("Ah, there you are. I see you.")
         face_detected = True

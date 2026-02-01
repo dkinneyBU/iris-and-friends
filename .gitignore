@@ -1,4 +1,7 @@
 .venv/
+images/
 logs.db
 iris-and-friends.code-workspace
 .env
+field_notes/2026-01-26_0838_transcript.txt
+field_notes/2026-01-26_0914_transcript.txt
