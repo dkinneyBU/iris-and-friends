@@ -1,11 +1,15 @@
 """
-V3.1: Two-context blackboard ecology with drift + context-specific assimilation.
-Key knobs:
-- MUTATE_PROB_A=...
-- MUTATE_PROB_B=...
-- read_prob: A=0.30, B=0.10
-- erase_prob: A=0.01, B=0.03
-Observables: margin, entropy, coupling
+V4.2: 
+- Add "coupling" variable to agents that tracks how well they are doing in each context, 
+  and modulates their influence on the blackboard accordingly. Coupling drifts down when 
+  incompatible, recovers when compatible. Context instability reduces influence.
+- Add "patch diversity" metric to track how much local-majority patchiness there is on 
+  the board (a kind of spatial diversity measure that should correlate with instability).
+  * local neighborhoods (RADIUS)
+  * mutation A/B
+  * erase A/B
+  * read_prob A/B
+  * compatibility = persistence + partial instant agreement
 """
 
 import random
@@ -198,9 +202,10 @@ def run():
 
     for _ in range(STEPS):
         for a in agents:
-            if random.random() < 0.5:
+            # visit both contexts each step, but asymmetrically
+            if random.random() < 0.8:
                 a.update(bbA, "A")
-            else:
+            if random.random() < 0.4:
                 a.update(bbB, "B")
 
         bbA.step()
@@ -241,9 +246,6 @@ def run():
     print("Min coupling A:", min(a.coupling_A for a in agents))
     print("Min coupling B:", min(a.coupling_B for a in agents))
 
-    print("Avg coupling A (mean):", sum(avg_coupling_A)/len(avg_coupling_A))
-    print("Avg coupling B (mean):", sum(avg_coupling_B)/len(avg_coupling_B))
-
     print("Max majority run A:", max_run(majA))
     print("Max majority run B:", max_run(majB))    
 
@@ -262,6 +264,9 @@ def run():
 
     print("A: patch_div", round(sum(patch_div_A)/len(patch_div_A), 3))
     print("B: patch_div", round(sum(patch_div_B)/len(patch_div_B), 3))
+
+    print("Avg coupling A (mean):", sum(avg_coupling_A)/len(avg_coupling_A))
+    print("Avg coupling B (mean):", sum(avg_coupling_B)/len(avg_coupling_B))
 
 if __name__ == "__main__":
     run()
