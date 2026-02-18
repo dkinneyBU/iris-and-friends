@@ -1,5 +1,6 @@
 .venv/
 images/
+field_notes/
 logs.db
 iris-and-friends.code-workspace
 .env

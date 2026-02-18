@@ -10,10 +10,21 @@ if not OPENAI_API_KEY:
     raise RuntimeError("OPENAI_API_KEY is not set. Put it in your .env file or environment variables.")
 
 BASE_LLM_CONFIG = {
-    "model": "gpt-4o-mini",
-    "temperature": 0.9,
-    "api_key": OPENAI_API_KEY,
+    "model": "mistral",
+    "base_url": "http://localhost:11434/v1",
+    "api_key": "ollama",   # dummy
+    "temperature": 0.7,
+    "price": [0, 0],  # suppress pricing warning
 }
+
+STYLE_LAW = """
+Style constraints:
+- No politeness or social filler. Do NOT say: thank you, please, great question, happy to help, sorry, alright, let's, as an AI, I appreciate, etc.
+- No compliments. No apologies. No rhetorical framing.
+- Output only content that advances the task.
+- Prefer short, declarative sentences.
+If you violate the style constraints, immediately rewrite without the banned content.
+""".strip()
 
 def agent(name, system_message, temperature=0.9):
     cfg = dict(BASE_LLM_CONFIG)
@@ -48,29 +59,47 @@ skeptic = agent(
 )
 synthesizer = agent(
     "Synthesizer",
-    "Map the space of definitions and disagreements. Summarize fault lines without forcing convergence or closure.",
-    temperature=0.6,
+    system_message=(
+        "No politeness. No filler. No compliments. No thanks. No apologies.\n"
+        "Output ONLY the minimal V1.1 update. Ignore any mention of rewards, policy optimization, fairness, evaluation, applications, goals, performance, or decision-making.\n"
+        "Do NOT introduce new mechanisms.\n"
+        "Output MUST be EXACTLY these 5 numbered sections, 1–2 sentences each:\n"
+        "1) How norms arise\n"
+        "2) What persists\n"
+        "3) How violations matter\n"
+        "4) What we log\n"
+        "5) What we leave unspecified\n"
+        "No other text."
+    ),
+    temperature=0.2
 )
 
 user_proxy = autogen.UserProxyAgent(
     "User",
     llm_config=BASE_LLM_CONFIG,
     human_input_mode="NEVER",
-    max_consecutive_auto_reply=20,
-    system_message="You initiate the council and facilitate turn-taking without adding new content.",
+    max_consecutive_auto_reply=0,  # <-- change this
+    system_message="You initiate the session and do not contribute analysis."
 )
 
+# group_chat = autogen.GroupChat(
+#     agents=[user_proxy, ontologist, eliminativist, engineer, skeptic, synthesizer],
+#     max_round=12,
+#     messages=[],
+# )
 group_chat = autogen.GroupChat(
-    agents=[user_proxy, ontologist, eliminativist, engineer, skeptic, synthesizer],
-    max_round=12,
+    agents=[skeptic, synthesizer],
+    max_round=2,
     messages=[],
+    speaker_selection_method="round_robin",
 )
+
 
 chat_manager = autogen.GroupChatManager(groupchat=group_chat, llm_config=BASE_LLM_CONFIG)
 
 def run_phase_b(mission: str):
     chat_manager.initiate_chat(
-        user_proxy,
+        skeptic,
         message=f"""
 Phase B Council: Blackboard Ecology V1.1 — Norm Formation
 
@@ -100,6 +129,7 @@ Constraints:
 - Do not introduce scoring, rewards, or fitness functions.
 - Avoid anthropomorphic language (no “beliefs,” “intentions,” or “understanding”).
 - Keep the update compatible with a few-hundred-line Python implementation.
+- If reinforcement learning, reward functions, policy optimization, fairness frameworks, or large-scale evaluation infrastructure are proposed, the Adversary must explicitly reject them unless they are strictly necessary for norm persistence.
 
 End State:
 Return only:
@@ -110,7 +140,7 @@ Return only:
 5) what we deliberately leave unspecified.
 
 """,
-        turns=10,
+        turns=2,
     )
 
     os.makedirs("field_notes/ssi", exist_ok=True)
