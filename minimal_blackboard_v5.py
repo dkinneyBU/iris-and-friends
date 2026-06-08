@@ -1,17 +1,3 @@
-"""
-V4.2: 
-- Add "coupling" variable to agents that tracks how well they are doing in each context, 
-  and modulates their influence on the blackboard accordingly. Coupling drifts down when 
-  incompatible, recovers when compatible. Context instability reduces influence.
-- Add "patch diversity" metric to track how much local-majority patchiness there is on 
-  the board (a kind of spatial diversity measure that should correlate with instability).
-  * local neighborhoods (RADIUS)
-  * mutation A/B
-  * erase A/B
-  * read_prob A/B
-  * compatibility = persistence + partial instant agreement
-"""
-
 import random
 import numpy as np
 from collections import Counter, deque
